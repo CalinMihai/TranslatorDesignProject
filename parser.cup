@@ -1,0 +1,173 @@
+/*
+   Simple +/-/* expression language; 
+   parser evaluates constant expressions on the fly
+*/
+
+package cup.example;
+
+import java_cup.runtime.*;
+import cup.example.Lexer;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+
+parser code {:
+  protected Lexer lexer;
+:}
+
+/* define how to connect to the scanner! */
+init with {:
+  ComplexSymbolFactory f = new ComplexSymbolFactory();
+  symbolFactory = f;
+  File file = new File("input.txt");
+  FileInputStream fis = null;
+  try {
+    fis = new FileInputStream(file);
+  } catch (IOException e) {
+    e.printStackTrace();
+  } 
+  lexer = new Lexer(f,fis);
+:};
+scan with {: return lexer.next_token(); :};
+
+/* Terminals (tokens returned by the scanner). */
+terminal            	ADD, SUB, MUL, DIV;
+terminal           		AND, OR, NOT;
+terminal            	EQUAL, LT, GT, LE, GE;
+terminal            	ASSIGN;
+terminal            	LPAR, RPAR, CLPAR, CRPAR, SLPAR, SRPAR;
+terminal				COLON, SEMICOLON, COMMA;
+terminal            	IF, THEN, WHILE, DO, READ, ELSE;
+terminal            	BEGIN, END, PRINT;
+terminal            	INT, BOOL, REAL, VAR;
+terminal            	SIZE, FLOAT, FLOOR, CEIL, FUN, RETURN;
+terminal Integer    	IVAL;        // our scanner provides numbers as integers
+terminal Real       	RVAL;
+terminal Boolean    	BVAL;
+terminal Identifier     ID;
+
+/* Non terminals */
+non terminal            prog;
+non terminal            block;
+
+non terminal            declarations;
+non terminal            declaration;
+non terminal            var_declaration;
+non terminal            type;
+
+non terminal            array_dimensions;
+non terminal            fun_declaration;
+non terminal            fun_block;
+non terminal            param_list;
+non terminal            parameters;
+non terminal            more_parameters;
+non terminal            basic_declaration;
+non terminal            basic_array_dimensions;
+non terminal            program_body;
+non terminal            fun_body;
+non terminal            prog_stmts;
+non terminal            prog_stmt;
+
+non terminal            identifier;
+non terminal            expr;
+non terminal            bint_term;
+non terminal            bint_factor;
+
+non terminal            compare_op;
+non terminal            int_expr;
+non terminal            addop;
+non terminal            int_term;
+non terminal            mulop;
+non terminal            int_factor;
+
+non terminal            modifier_list;
+non terminal            arguments;
+non terminal 		    more_arguments;      // used to store evaluated subexpressions
+
+
+/* The grammar rules */
+prog  ::= block													{: :}
+		;
+block ::= declarations program_body {: :}
+		;
+
+declarations      ::= declaration SEMICOLON declarations {: :}
+					;
+declaration       ::= var_declaration 
+                     | fun_declaration {: :}
+                     ;
+var_declaration   ::= VAR ID array_dimensions COLON type {: :}
+					;
+type              ::= INT
+                     | REAL
+                     | BOOL {: :}
+                     ;
+
+array_dimensions        ::= SLPAR expr SRPAR array_dimensions {: :}
+						;
+fun_declaration         ::= FUN ID param_list COLON type CLPAR fun_block CRPAR {: :}
+						;
+fun_block               ::= declarations fun_body {: :}
+						;
+param_list              ::= LPAR parameters RPAR {: :}
+						;
+parameters              ::= basic_declaration more_parameters  {: :}
+						;
+more_parameters         ::= COMMA basic_declaration more_parameters {: :}
+						;
+basic_declaration       ::= ID basic_array_dimensions COLON type {: :}
+						;
+basic_array_dimensions  ::= SLPAR SRPAR basic_array_dimensions  {: :}
+						;
+program_body            ::= BEGIN prog_stmts END {: :}
+						;
+fun_body                ::= BEGIN prog_stmts RETURN expr SEMICOLON END {: :}
+						;
+prog_stmts              ::= prog_stmt SEMICOLON prog_stmts {: :}
+						;
+prog_stmt               ::= IF expr THEN prog_stmt ELSE prog_stmt
+                           | WHILE expr DO prog_stmt
+                           | READ identifier
+                           | identifier ASSIGN expr
+                           | PRINT expr
+                           | CLPAR block CRPAR {: :}
+                           ;
+
+identifier        ::= ID array_dimensions {: :}
+					;
+expr              ::= expr OR bint_term | bint_term {: :}
+					;
+bint_term         ::= bint_term AND bint_factor | bint_factor {: :}
+					;
+bint_factor       ::= NOT bint_factor
+                     | int_expr compare_op int_expr
+                     | int_expr {: :}
+                     ;
+compare_op        ::= EQUAL | LT | GT | LE |GE {: :}
+					;
+int_expr          ::= int_expr addop int_term | int_term {: :}
+					;
+addop             ::= ADD | SUB {: :}
+					;
+int_term          ::= int_term mulop int_factor | int_factor {: :}
+					;
+mulop             ::= MUL | DIV {: :}
+					;
+int_factor        ::= LPAR expr RPAR
+                      | SIZE LPAR ID basic_array_dimensions RPAR
+                      | FLOAT LPAR expr RPAR
+                      | FLOOR LPAR expr RPAR
+                      | CEIL LPAR expr RPAR
+                      | ID modifier_list
+                      | IVAL
+                      | RVAL
+                      | BVAL
+                      | SUB int_factor {: :}
+                      ;
+modifier_list     ::= LPAR arguments RPAR | array_dimensions {: :}
+					;
+arguments         ::= expr more_arguments  {: :}
+					;
+more_arguments    ::= COMMA expr more_arguments {: :}
+					;
+       
