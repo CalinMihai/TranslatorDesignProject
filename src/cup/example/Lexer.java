@@ -5,6 +5,7 @@ import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.Location;
 import java_cup.runtime.Symbol;
 import java.lang.*;
+import java.io.FileInputStream;
 import java.io.InputStreamReader; 	
 
 
@@ -313,7 +314,10 @@ public class Lexer implements sym, java_cup.runtime.Scanner {
     this(new java.io.InputStreamReader(in));
   }
 
-  /** 
+  public Lexer(ComplexSymbolFactory f, FileInputStream fis) {
+	// TODO Auto-generated constructor stub
+}
+/** 
    * Unpacks the split, compressed DFA transition table.
    *
    * @return the unpacked transition table
@@ -792,9 +796,6 @@ public class Lexer implements sym, java_cup.runtime.Scanner {
         case 14: 
           {  return symbol(sym.EQUAL);  }
         case 135: break;
-        case 33: 
-          {  return symbol(sym.KILL);  }
-        case 136: break;
         case 77: 
           {  return symbol(sym.THEN);  }
         case 137: break;

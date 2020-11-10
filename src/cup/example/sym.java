@@ -8,76 +8,101 @@ package cup.example;
 /** CUP generated interface containing symbol constants. */
 public interface sym {
   /* terminals */
-  public static final int MINUS = 41;
-  public static final int UMINUS = 42;
-  public static final int NUMBER = 43;
-  public static final int SEMI = 44;
-  public static final int EOF = 45;
-  public static final int PLUS = 46;
-  public static final int error = 47;
-  public static final int RPAREN = 48;
-  public static final int TIMES = 49;
-  public static final int LPAREN = 50;
-  
-	public static final int ADD = 53;
-	public static final int SUB = 1;
-	public static final int MUL = 2;
-	public static final int DIV = 3;
-	
-	public static final int AND = 4;
-	public static final int OR = 5;
-	public static final int NOT = 6;
-	
-	public static final int EQUAL = 7;
-	public static final int LT = 8;
-	public static final int GT = 9;
-	public static final int LE = 10;
-	public static final int GE = 11;
-	
-	public static final int ASSIGN = 12;
-	
-	public static final int LPAR = 13;
-	public static final int RPAR = 14;
-	public static final int CLPAR = 15;
-	public static final int CRPAR = 16;
-	public static final int SLPAR = 17;
-	public static final int SRPAR = 18;
-	
-	public static final int COLON = 19;
-	public static final int SEMICOLON = 20;
-	public static final int COMMA = 21;
-	
-	public static final int IF = 22;
-	public static final int THEN = 23;
-	public static final int WHILE = 24;
-	public static final int DO = 25;
-	public static final int READ = 26;
-	public static final int ELSE = 27;
-	public static final int BEGIN = 28;
-	public static final int END = 29;
-	public static final int PRINT = 30;
-	public static final int INT = 31;
-	public static final int BOOL = 32;
-	public static final int REAL = 33;
-	public static final int VAR = 34;
-	public static final int SIZE = 35;
-	public static final int FLOAT = 36;
-	public static final int FLOOR = 37;
-	public static final int CEIL = 38;
-	public static final int FUN = 39;
-	public static final int RETURN = 40;
-	public static final int KILL = 51;
+  public static final int GE = 13;
+  public static final int BVAL = 45;
+  public static final int SLPAR = 19;
+  public static final int INT = 33;
+  public static final int FLOOR = 39;
+  public static final int NOT = 8;
+  public static final int SEMICOLON = 22;
+  public static final int AND = 6;
+  public static final int LT = 10;
+  public static final int RPAR = 16;
+  public static final int FUN = 41;
+  public static final int OR = 7;
+  public static final int BOOL = 34;
+  public static final int COMMA = 23;
+  public static final int DIV = 5;
+  public static final int BEGIN = 30;
+  public static final int ASSIGN = 14;
+  public static final int IF = 24;
+  public static final int ID = 46;
+  public static final int LE = 12;
+  public static final int EOF = 0;
+  public static final int RETURN = 42;
+  public static final int EQUAL = 9;
+  public static final int SIZE = 37;
+  public static final int CLPAR = 17;
+  public static final int error = 1;
+  public static final int MUL = 4;
+  public static final int ADD = 2;
+  public static final int SRPAR = 20;
+  public static final int REAL = 35;
+  public static final int RVAL = 44;
+  public static final int COLON = 21;
+  public static final int ELSE = 29;
+  public static final int READ = 28;
+  public static final int WHILE = 26;
+  public static final int FLOAT = 38;
+  public static final int THEN = 25;
+  public static final int END = 31;
+  public static final int LPAR = 15;
+  public static final int CEIL = 40;
+  public static final int GT = 11;
+  public static final int SUB = 3;
+  public static final int VAR = 36;
+  public static final int PRINT = 32;
+  public static final int DO = 27;
+  public static final int CRPAR = 18;
+  public static final int IVAL = 43;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
-  "SEMI",
-  "PLUS",
-  "MINUS",
-  "UMINUS",
-  "TIMES",
-  "LPAREN",
-  "RPAREN",
-  "NUMBER"
+  "ADD",
+  "SUB",
+  "MUL",
+  "DIV",
+  "AND",
+  "OR",
+  "NOT",
+  "EQUAL",
+  "LT",
+  "GT",
+  "LE",
+  "GE",
+  "ASSIGN",
+  "LPAR",
+  "RPAR",
+  "CLPAR",
+  "CRPAR",
+  "SLPAR",
+  "SRPAR",
+  "COLON",
+  "SEMICOLON",
+  "COMMA",
+  "IF",
+  "THEN",
+  "WHILE",
+  "DO",
+  "READ",
+  "ELSE",
+  "BEGIN",
+  "END",
+  "PRINT",
+  "INT",
+  "BOOL",
+  "REAL",
+  "VAR",
+  "SIZE",
+  "FLOAT",
+  "FLOOR",
+  "CEIL",
+  "FUN",
+  "RETURN",
+  "IVAL",
+  "RVAL",
+  "BVAL",
+  "ID"
   };
 }
 

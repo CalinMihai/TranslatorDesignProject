@@ -12,13 +12,13 @@
 
 	  <target name="generate">
 	    
-	   <!-- <cup srcfile="${base}/parser.cup"  destdir="${java}" 
+	    <cup srcfile="${base}/parser.cup"  destdir="${java}" 
 	          parser="Parser"
 			  interface="true"
 	  	      locations="true"
 	          debugsymbols="true" />
-	  -->
-	  	<jflex  file="lexer.jflex" destdir="${java}" />
+	  
+	  	<jflex  file="Lexer.jflex" destdir="${java}" />
 	  </target>
 
 	  <path id="libraries">
