@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*; 	
 import java_cup.runtime.ComplexSymbolFactory.*;
 
+
 %%
 
 %class Lexer
@@ -16,59 +17,77 @@ import java_cup.runtime.ComplexSymbolFactory.*;
 
 %{
 	private ComplexSymbolFactory symbolFactory;
+	
 	public Lexer( ComplexSymbolFactory factory, InputStream in){
 	 	 this(new java.io.InputStreamReader(in));
 	 	 this.symbolFactory = factory;
 	}
+	
 	StringBuffer string = new StringBuffer();
 
       private Symbol symbol(int code) {
         int yylen = yylength();
     	Location left = new Location(yyline + 1, yycolumn + 1, yychar);
 	    Location right = new Location(yyline + 1, yycolumn + yylen, yychar + yylen);
-	    // Calculate symbol name
 	    int max_code = sym.terminalNames.length;
 	    String name = code < max_code ? sym.terminalNames[code] : "<UNKNOWN(" + yytext() + ")>";
 	    return this.symbolFactory.newSymbol(name, code, left, right);
-        //new Symbol(type, yyline, yycolumn);
+
       }
+      
       private Symbol symbol(int code, Object value) {
-        // Calculate symbol location
 	    int yylen = yylength();
 	    Location left = new Location(yyline + 1, yycolumn + 1, yychar);
 	    Location right = new Location(yyline + 1, yycolumn + yylen, yychar + yylen);
-	    // Calculate symbol name
 	    int max_code = sym.terminalNames.length;
 	    String name = code < max_code ? sym.terminalNames[code] : "<UNKNOWN(" + yytext() + ")>";
 	    return this.symbolFactory.newSymbol(name, code, left, right, value);
-        // new Symbol(type, yyline, yycolumn, value);
+
       }
+      
+      private Symbol symbol(String name, int sym, Object val) {
+      	Location left = new Location(yyline+1,yycolumn+1,yychar);
+      	Location right= new Location(yyline+1,yycolumn+yylength(), yychar+yylength());
+      	return symbolFactory.newSymbol(name, sym, left, right,val);
+ 	 } 
+      
 %}
 
-DIGIT	=	[0-9]
-ALPHA	=	[a-zA-Z]
-ID		=	[:jletter:] [:jletterdigit:]*
-IVAL	=	{DIGIT}+
-RVAL	=	{DIGIT}*.{DIGIT}+
-BVAL	=	"true" | "false"
+DIGIT		=	[0-9]
+ALPHA		=	[a-zA-Z]
+Identifier	=	[a-zA-Z_0-9]*
+IVAL		=	[0-9+]
+RVAL		=	[0-9]*.[0-9+]
+BVAL		=	"true" | "false"
 
 LineTerminator = \r|\n|\r\n
 InputCharacter = [^\r\n]
 WhiteSpace     = {LineTerminator} | [ \t\f]
 
-Multi_line_comment   = "/*" [^*] ~"*/" | "/*" "*"+ "/"
-Single_line_comment  = "%" {InputCharacter}* {LineTerminator}?
+/* comments */
+Comment = {TraditionalComment} | {OneLineComment}
 
+TraditionalComment   = "/*" [^*] ~"*/" | "/*" "*"+ "/"
+// Comment can be the last line of the file, without line terminator.
+OneLineComment     = "%" {InputCharacter}* {LineTerminator}?
 
-%%
+%eofval{
+    return symbol(sym.EOF);
+%eofval}
+
+%state CODESEG
+
+%%  
 
 <YYINITIAL> {
 
-	{Multi_line_comment}			{ /* ignore */ }
-	{Single_line_comment}			{ /* ignore */ }
-
-
-	"+"			{ return symbol(sym.ADD); }
+  
+	{Comment}                      { /* ignore */ }
+    {WhiteSpace}                   { /* ignore */ }
+    
+	
+	
+	"+"				{ return symbol(sym.ADD); }
 	"-" 			{ return symbol(sym.SUB); }
 	"*" 			{ return symbol(sym.MUL); }
 	"/" 			{ return symbol(sym.DIV); }
@@ -114,4 +133,6 @@ Single_line_comment  = "%" {InputCharacter}* {LineTerminator}?
 	"ceil" 			{ return symbol(sym.CEIL); }
 	"fun" 			{ return symbol(sym.FUN); }
 	"return" 		{ return symbol(sym.RETURN); }
+	
+	{Identifier}           { return symbol(sym.ID, yytext()); } 
 }
