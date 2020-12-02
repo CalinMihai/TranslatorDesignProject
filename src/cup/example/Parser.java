@@ -34,7 +34,7 @@ public class Parser extends java_cup.runtime.lr_parser {
   /** Production table. */
   protected static final short _production_table[][] = 
     unpackFromStrings(new String[] {
-    "\000\106\000\002\002\003\000\002\002\004\000\002\003" +
+    "\000\106\000\002\002\004\000\002\002\003\000\002\003" +
     "\004\000\002\004\005\000\002\004\002\000\002\005\003" +
     "\000\002\005\003\000\002\006\007\000\002\007\003\000" +
     "\002\007\003\000\002\007\003\000\002\010\006\000\002" +
@@ -66,7 +66,7 @@ public class Parser extends java_cup.runtime.lr_parser {
     "\000\220\000\010\040\ufffd\046\004\053\012\001\002\000" +
     "\004\060\217\001\002\000\004\030\ufffb\001\002\000\004" +
     "\030\ufffc\001\002\000\004\040\214\001\002\000\004\002" +
-    "\212\001\002\000\004\002\001\001\002\000\004\060\016" +
+    "\212\001\002\000\004\002\000\001\002\000\004\060\016" +
     "\001\002\000\004\030\014\001\002\000\010\040\ufffd\046" +
     "\004\053\012\001\002\000\004\040\ufffe\001\002\000\004" +
     "\021\020\001\002\000\004\027\042\001\002\000\006\022" +
@@ -240,7 +240,7 @@ public class Parser extends java_cup.runtime.lr_parser {
     "\011\107\035\206\001\002\000\016\023\055\032\054\034" +
     "\052\036\051\042\060\060\057\001\002\000\006\030\uffe5" +
     "\037\uffe5\001\002\000\006\030\uffe4\037\uffe4\001\002\000" +
-    "\004\030\ufff4\001\002\000\004\002\000\001\002\000\006" +
+    "\004\030\ufff4\001\002\000\004\002\001\001\002\000\006" +
     "\002\uffff\024\uffff\001\002\000\020\023\055\032\054\034" +
     "\052\036\051\041\uffe7\042\060\060\057\001\002\000\004" +
     "\041\216\001\002\000\006\002\uffea\024\uffea\001\002\000" +
@@ -351,7 +351,7 @@ public class Parser extends java_cup.runtime.lr_parser {
   /** Indicates start state. */
   public int start_state() {return 0;}
   /** Indicates start production. */
-  public int start_production() {return 1;}
+  public int start_production() {return 0;}
 
   /** <code>EOF</code> Symbol index. */
   public int EOF_sym() {return 0;}
@@ -416,17 +416,7 @@ class CUP$Parser$actions {
       switch (CUP$Parser$act_num)
         {
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 0: // prog ::= block 
-            {
-              Object RESULT =null;
-		//@@CUPDBG3
- 
-              CUP$Parser$result = parser.getSymbolFactory().newSymbol("prog",0, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
-            }
-          return CUP$Parser$result;
-
-          /*. . . . . . . . . . . . . . . . . . . .*/
-          case 1: // $START ::= prog EOF 
+          case 0: // $START ::= prog EOF 
             {
               Object RESULT =null;
 		Location start_valxleft = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).xleft;
@@ -437,6 +427,16 @@ class CUP$Parser$actions {
             }
           /* ACCEPT */
           CUP$Parser$parser.done_parsing();
+          return CUP$Parser$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 1: // prog ::= block 
+            {
+              Object RESULT =null;
+		//@@CUPDBG3
+ 
+              CUP$Parser$result = parser.getSymbolFactory().newSymbol("prog",0, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
+            }
           return CUP$Parser$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/

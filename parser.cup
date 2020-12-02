@@ -46,6 +46,8 @@ terminal Real       	RVAL;
 terminal Boolean    	BVAL;
 terminal Identifier     ID;
 
+
+
 /* Non terminals */
 non terminal            prog;
 non terminal            block;
@@ -84,47 +86,61 @@ non terminal            modifier_list;
 non terminal            arguments;
 non terminal 		    more_arguments;      // used to store evaluated subexpressions
 
+precedence left  ADD, SUB;
+precedence left  MUL, DIV;
+precedence left  EQUAL;
+precedence left  LT;
+precedence left  GT;
+precedence left  LE, GE;
+
 
 /* The grammar rules */
-prog  ::= block																	{: :}
+start with prog;
+prog  ::= block:b														{: Program p = new Program(b); p.exec(); :}	
 		;
-block ::= declarations program_body 											{: :}
+block ::= declarations:decl program_body:pbod 							{: RESULT = new Block(decl, pbod); :}
 		;
 
-declarations      ::= declaration SEMICOLON declarations | 						{: :}
-					;
-declaration       ::= var_declaration 
-                     | fun_declaration											{: :}
+declarations      ::= declaration:decl SEMICOLON declarations:decls 	{: RESULT = new CreateDeclarationsNode(decl, decls); :}
+					 |										 			{: RESULT = NULL; :}
+					 ;
+declaration       ::= var_declaration:vdecl 							{: RESULT = new CreateDeclarationNode(vdecl); :}
+                     | fun_declaration:fdecl							{: RESULT = new CreateDeclarationNode(fdecl); :}
                      ;
-var_declaration   ::= VAR ID array_dimensions COLON type 						{: :}
-					;	
-type              ::= INT
-                     | REAL
-                     | BOOL 												 	{: :}
+var_declaration   ::= VAR ID array_dimensions:ad COLON type:t 			{: RESULT = new CreateVarDeclarationNode(ad, t);  :}
+					 ;	
+type              ::= INT:intt											{: RESULT = new Type(intt); :}	
+                     | REAL:reall										{: RESULT = new Type(reall); :}
+                     | BOOL:booll										{: RESULT = new Type(booll); :}
                      ;
 
-array_dimensions        ::= SLPAR expr SRPAR array_dimensions | 				{: :}
-						;
-fun_declaration         ::= FUN ID param_list COLON type CLPAR fun_block CRPAR  {: :}
-						;
-fun_block               ::= declarations fun_body 								{: :}
-						;
-param_list              ::= LPAR parameters RPAR								{: :}
-						;
-parameters              ::= basic_declaration more_parameters | 				{: :}
-						;
-more_parameters         ::= COMMA basic_declaration more_parameters | 			{: :}
-						;
-basic_declaration       ::= ID basic_array_dimensions COLON type 				{: :}
-						;
-basic_array_dimensions  ::= SLPAR SRPAR basic_array_dimensions | 				{: :}
-						;
-program_body            ::= BEGIN prog_stmts END 								{: :}
-						;
-fun_body                ::= BEGIN prog_stmts RETURN expr SEMICOLON END 			{: :}
-						;
-prog_stmts              ::= prog_stmt SEMICOLON prog_stmts | 					{: :}
-						;
+array_dimensions        ::= SLPAR expr:e SRPAR array_dimensions:ad 							{: RESULT = new CreateArrayDim(e, ad);:}	
+							|									 							{: RESULT = NULL; :}
+							;
+fun_declaration         ::= FUN ID param_list:plist COLON type:t CLPAR fun_block:fb CRPAR  	{: RESULT = new CreateFunDeclaration(plist,t,fb); :}
+							;
+fun_block               ::= declarations:decl fun_body:fb 									{: RESULT = new CreateFunBlock(decl, fb); :}
+							;
+param_list              ::= LPAR parameters:e RPAR								{: RESULT = new Node(e); :}
+							;
+parameters              ::= basic_declaration:bdecl more_parameters:mpar		{: RESULT = new CreateParametersNode(bdecl, mpar); :}
+							| 													{: RESULT = NULL; :}
+							;
+more_parameters         ::= COMMA basic_declaration:bdecl more_parameters:mpar 	{: RESULT = new CreateMoreParammetres(bdecl, mpar); :}
+							| 													{: RESULT = NULL; :}
+							;
+basic_declaration       ::= ID basic_array_dimensions:bad COLON type:t 			{: RESULT = new CreateBasicDeclaratiion(bad); :}
+							;
+basic_array_dimensions  ::= SLPAR SRPAR basic_array_dimensions:bad 				{: RESULT = new CreateBadFun(bad); :}	
+						    | 													{: RESULT = NULL; :}
+							;
+program_body            ::= BEGIN prog_stmts:pstms END 							{: RESULT = new CreateProgBody(pstms);  :}
+							;
+fun_body                ::= BEGIN prog_stmts:pstms RETURN expr:e SEMICOLON END 	{: RESULT = new FunBody(pstms,e); :}
+							;
+prog_stmts              ::= prog_stmt:pstm SEMICOLON prog_stmts:pstms 			{: RESULT = new ProgStmts(pstm, pstms); :}
+						    | 													{: RESULT = NULL; :}
+							;
 prog_stmt               ::= IF expr THEN prog_stmt ELSE prog_stmt
                            | WHILE expr DO prog_stmt
                            | READ identifier
@@ -135,39 +151,52 @@ prog_stmt               ::= IF expr THEN prog_stmt ELSE prog_stmt
 
 identifier        ::= ID array_dimensions 										{: :}
 					;
-expr              ::= expr OR bint_term | bint_term 							{: :}
+expr              ::= expr OR bint_term 
+					| bint_term 												{: :}
 					;
-bint_term         ::= bint_term AND bint_factor | bint_factor 					{: :}
+bint_term         ::= bint_term AND bint_factor 
+					| bint_factor 												{: :}
 					;
 bint_factor       ::= NOT bint_factor
-                     | int_expr compare_op int_expr
-                     | int_expr 												{: :}
-                     ;
-compare_op        ::= EQUAL | LT | GT | LE |GE 									{: :}
+                    | int_expr compare_op int_expr
+                    | int_expr 												{: :}
+                    ;
+compare_op        ::= EQUAL 											{: :}
+					| LT 												{: :}
+					| GT 												{: :}
+					| LE 												{: :}
+					| GE 												{: :}
 					;
-int_expr          ::= int_expr addop int_term | int_term 						{: :}
+int_expr          ::= int_expr:e addop:aop int_term:t 					{:RESULT = new Node(aop.val, e, t, aop.start); :}
+					| int_term:t 										{:RESULT = new Node(t.val, t.start); :}
 					;
-addop             ::= ADD | SUB 												{: :}
+addop             ::= int_term:e1 ADD:add int_term:e2 					{:RESULT = new Node(add.val, e1, e2, add.start); :}
+					| int_term:e1 SUB:sub int_term:e2 					{:RESULT = new Node(sub.val, e1, e2, sub.start); :}
 					;
-int_term          ::= int_term mulop int_factor | int_factor 					{: :}
+int_term          ::= int_term:t mulop:mop int_factor:f					{:RESULT = new Node(mop.val, f, t, mop.start); :}
+					| int_factor:f 										{:RESULT = new Node(f.val, f.start); :}
 					;
-mulop             ::= MUL | DIV 												{: :}
+mulop              ::= int_term:e1 MUL:mul int_term:e2 					{:RESULT = new Node(mul.val, e1, e2, mul.start); :}
+					|  int_term:e1 DIV:div int_term:e2 					{:RESULT = new Node(div.val, e1, e2, div.start); :}
 					;
-int_factor        ::= LPAR expr RPAR
-                      | SIZE LPAR ID basic_array_dimensions RPAR
-                      | FLOAT LPAR expr RPAR
-                      | FLOOR LPAR expr RPAR
-                      | CEIL LPAR expr RPAR
-                      | ID modifier_list
-                      | IVAL
-                      | RVAL
-                      | BVAL
-                      | SUB int_factor 											{: :}
-                      ;
-modifier_list     ::= LPAR arguments RPAR | array_dimensions 					{: :}
+int_factor        ::= LPAR expr:e RPAR									{:RESULT = new Node(e); :}
+                    | SIZE:s LPAR ID basic_array_dimensions:bad RPAR	{:RESULT = new Size(s, bad); :}
+                    | FLOAT:flt LPAR expr:e RPAR						{:RESULT = new Float(flt, e); :}
+                    | FLOOR:flr LPAR expr:e RPAR						{:RESULT = new Floor(flr, e); :}
+                    | CEIL:c LPAR expr:e RPAR							{:RESULT = new Ceil(c, e); :}
+                    | ID modifier_list:mlist							{:RESULT = new Id(mlist); :}
+                    | IVAL:i											{:RESULT = new Ival(i); :}
+                    | RVAL:r											{:RESULT = new Rval(r); :}
+                    | BVAL:b											{:RESULT = new Bval(b); :}
+                    | SUB:sub int_factor:f 								{:RESULT = new Node(sub.val, f, sub.start); :}
+                    ;
+modifier_list     ::= LPAR arguments:arg RPAR 							{:RESULT = new Node(arg); :}
+					| array_dimensions:ad 								{:RESULT = new Node(ad); :}
 					;
-arguments         ::= expr more_arguments | 									{: :}
+arguments         ::= expr:e more_arguments:marg						{:RESULT = new Argument(e, marg); :}
+					| 													{:RESULT = NULL; :}
 					;
-more_arguments    ::= COMMA expr more_arguments  | 								{: :}
+more_arguments    ::= COMMA expr:e more_arguments:marg  				{:RESULT = new AddArgument(e, marg); :}
+					| 													{:RESULT = NULL; :}
 					;
        
